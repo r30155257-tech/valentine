@@ -1,65 +1,149 @@
-import Image from "next/image";
+'use client'
+import { motion } from 'framer-motion'
+import { useState, useEffect } from 'react'
+import Link from 'next/link'
+import { Heart, Camera, BookOpen, Sparkles, Music, Mail } from 'lucide-react'
 
 export default function Home() {
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+    <div className="min-h-screen bg-gradient-to-br from-rose-100 via-pink-50 to-purple-100 flex items-center justify-center p-4 overflow-hidden relative">
+      {/* Floating hearts animation - only render after mount */}
+      {mounted && (
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {[...Array(20)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute"
+              initial={{ 
+                x: Math.random() * window.innerWidth,
+                y: window.innerHeight + 100,
+                opacity: 0 
+              }}
+              animate={{ 
+                y: -100,
+                opacity: [0, 1, 1, 0],
+              }}
+              transition={{
+                duration: Math.random() * 10 + 10,
+                repeat: Infinity,
+                delay: Math.random() * 5,
+              }}
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+              <Heart className="w-6 h-6 text-rose-300 fill-rose-300" />
+            </motion.div>
+          ))}
+        </div>
+      )}
+
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        className="text-center max-w-5xl relative z-10"
+      >
+        <motion.div
+          animate={{ 
+            scale: [1, 1.2, 1],
+            rotate: [0, 5, -5, 0] 
+          }}
+          transition={{ 
+            duration: 3, 
+            repeat: Infinity, 
+            repeatDelay: 1 
+          }}
+          className="mb-8 flex justify-center"
+        >
+          <Heart className="w-24 h-24 text-rose-500 fill-rose-500 drop-shadow-lg" />
+        </motion.div>
+        
+        <motion.h1 
+          className="text-5xl md:text-7xl font-bold text-gray-800 mb-4"
+          animate={{ 
+            textShadow: [
+              "0 0 20px rgba(244, 63, 94, 0.3)",
+              "0 0 40px rgba(244, 63, 94, 0.5)",
+              "0 0 20px rgba(244, 63, 94, 0.3)",
+            ]
+          }}
+          transition={{ duration: 2, repeat: Infinity }}
+        >
+          Our Love Story
+        </motion.h1>
+        
+        <p className="text-xl md:text-3xl text-gray-600 mb-4">
+          From an awkward hello to forever together
+        </p>
+        <p className="text-lg md:text-xl text-rose-500 font-semibold mb-12">
+          Since 14th October ✨
+        </p>
+
+        {/* Navigation Cards - Centered Layout */}
+        <div className="flex flex-wrap justify-center gap-6 mt-12 max-w-4xl mx-auto">
+          <Link href="/gallery">
+            <motion.div 
+              whileHover={{ scale: 1.05, y: -5 }}
+              className="bg-white/80 backdrop-blur p-6 rounded-2xl shadow-xl cursor-pointer hover:shadow-2xl transition-all group w-40"
             >
-              Learning
-            </a>{" "}
-            center.
+              <Camera className="w-10 h-10 text-rose-500 mx-auto mb-3 group-hover:scale-110 transition-transform" />
+              <h3 className="text-lg font-semibold text-gray-800">Gallery</h3>
+              <p className="text-gray-600 text-sm mt-2">Our memories</p>
+            </motion.div>
+          </Link>
+
+          <Link href="/story">
+            <motion.div 
+              whileHover={{ scale: 1.05, y: -5 }}
+              className="bg-white/80 backdrop-blur p-6 rounded-2xl shadow-xl cursor-pointer hover:shadow-2xl transition-all group w-40"
+            >
+              <BookOpen className="w-10 h-10 text-purple-500 mx-auto mb-3 group-hover:scale-110 transition-transform" />
+              <h3 className="text-lg font-semibold text-gray-800">Timeline</h3>
+              <p className="text-gray-600 text-sm mt-2">Our journey</p>
+            </motion.div>
+          </Link>
+
+          
+
+          <Link href="/letter">
+            <motion.div 
+              whileHover={{ scale: 1.05, y: -5 }}
+              className="bg-white/80 backdrop-blur p-6 rounded-2xl shadow-xl cursor-pointer hover:shadow-2xl transition-all group w-40"
+            >
+              <Mail className="w-10 h-10 text-amber-500 mx-auto mb-3 group-hover:scale-110 transition-transform" />
+              <h3 className="text-lg font-semibold text-gray-800">Love Letter</h3>
+              <p className="text-gray-600 text-sm mt-2">From my heart</p>
+            </motion.div>
+          </Link>
+
+          <Link href="/quotes">
+            <motion.div 
+              whileHover={{ scale: 1.05, y: -5 }}
+              className="bg-white/80 backdrop-blur p-6 rounded-2xl shadow-xl cursor-pointer hover:shadow-2xl transition-all group w-40"
+            >
+              <Sparkles className="w-10 h-10 text-indigo-500 mx-auto mb-3 group-hover:scale-110 transition-transform" />
+              <h3 className="text-lg font-semibold text-gray-800">Quotes</h3>
+              <p className="text-gray-600 text-sm mt-2">Love notes</p>
+            </motion.div>
+          </Link>
+        </div>
+
+        {/* Special message */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1, duration: 1 }}
+          className="mt-16 p-8 bg-gradient-to-r from-rose-500 via-pink-500 to-purple-500 rounded-3xl shadow-2xl"
+        >
+          <p className="text-2xl md:text-3xl text-white font-semibold">
+            To the girl who turned my awkward moments into beautiful memories 💕
           </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+        </motion.div>
+      </motion.div>
     </div>
-  );
+  )
 }
