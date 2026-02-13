@@ -3,7 +3,7 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import Link from 'next/link'
-import { Heart, Camera, BookOpen, Sparkles, Mail, Volume2, VolumeX, Download, Share2, X, LockKeyhole, Gift, Star, MessageCircle, Calendar } from 'lucide-react'
+import { Heart, Camera, BookOpen, Sparkles, Mail, Volume2, VolumeX, Download, Share2, X, LockKeyhole, Gift, Star, MessageCircle, Calendar, Flame, Trophy, Wand2, Image as ImageIcon, Send } from 'lucide-react'
 import Image from 'next/image'
 
 /* -------------------- Image Data -------------------- */
@@ -69,7 +69,331 @@ const calculateTimeLeft = () => {
 
 const random = (min: number, max: number) => Math.random() * (max - min) + min;
 
-/* -------------------- Sub-Components -------------------- */
+/* -------------------- NEW: Love Calculator -------------------- */
+function LoveCalculator() {
+  const [percentage, setPercentage] = useState(0)
+  const [isCalculating, setIsCalculating] = useState(false)
+  const [hasCalculated, setHasCalculated] = useState(false)
+
+  const calculate = () => {
+    setIsCalculating(true)
+    setHasCalculated(false)
+    setPercentage(0)
+    
+    let current = 0
+    const target = 100
+    const interval = setInterval(() => {
+      current += Math.random() * 15
+      if (current >= target) {
+        setPercentage(100)
+        setIsCalculating(false)
+        setHasCalculated(true)
+        clearInterval(interval)
+      } else {
+        setPercentage(Math.floor(current))
+      }
+    }, 50)
+  }
+
+  return (
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="bg-gradient-to-br from-red-500 via-pink-500 to-rose-500 p-6 rounded-3xl shadow-2xl relative overflow-hidden h-full"
+    >
+      <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl" />
+      <div className="relative z-10">
+        <h3 className="text-white font-bold text-xl mb-4 flex items-center justify-center gap-2">
+          <Flame className="animate-pulse" /> Love Compatibility
+        </h3>
+        
+        <div className="bg-white/20 backdrop-blur-md rounded-2xl p-6 mb-4">
+          <div className="text-center">
+            <motion.div 
+              className="text-7xl font-black text-white mb-2"
+              animate={isCalculating ? { scale: [1, 1.1, 1] } : {}}
+              transition={{ duration: 0.3, repeat: isCalculating ? Infinity : 0 }}
+            >
+              {percentage}%
+            </motion.div>
+            {hasCalculated && (
+              <motion.p
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-white/90 text-sm font-medium"
+              >
+                Perfect Match! 💕
+              </motion.p>
+            )}
+          </div>
+        </div>
+
+        <motion.button
+          onClick={calculate}
+          disabled={isCalculating}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className="w-full bg-white text-rose-600 font-bold py-3 rounded-xl shadow-lg disabled:opacity-50"
+        >
+          {isCalculating ? 'Calculating...' : hasCalculated ? 'Calculate Again' : 'Calculate Our Love'}
+        </motion.button>
+      </div>
+    </motion.div>
+  )
+}
+
+/* -------------------- NEW: Couple Quiz -------------------- */
+
+
+/* -------------------- NEW: Wish Jar -------------------- */
+function WishJar() {
+  const [wishes, setWishes] = useState<string[]>([])
+  const [newWish, setNewWish] = useState('')
+  const [showWish, setShowWish] = useState<string | null>(null)
+
+  useEffect(() => {
+    const saved = localStorage.getItem('loveWishes')
+    if (saved) setWishes(JSON.parse(saved))
+  }, [])
+
+  const addWish = () => {
+    if (newWish.trim()) {
+      const updated = [...wishes, newWish]
+      setWishes(updated)
+      localStorage.setItem('loveWishes', JSON.stringify(updated))
+      setNewWish('')
+    }
+  }
+
+  const drawWish = () => {
+    if (wishes.length > 0) {
+      const randomWish = wishes[Math.floor(Math.random() * wishes.length)]
+      setShowWish(randomWish)
+    }
+  }
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="bg-gradient-to-br from-amber-400 to-orange-500 p-6 rounded-3xl shadow-2xl h-full"
+    >
+      <h3 className="text-white font-bold text-xl mb-4 flex items-center justify-center gap-2">
+        <Sparkles /> Wish Jar
+      </h3>
+      
+      <div className="bg-white/20 backdrop-blur-md rounded-2xl p-4 mb-4">
+        <input
+          type="text"
+          value={newWish}
+          onChange={(e) => setNewWish(e.target.value)}
+          onKeyPress={(e) => e.key === 'Enter' && addWish()}
+          placeholder="Make a wish for us..."
+          className="w-full bg-white/30 text-white placeholder-white/70 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-white/50"
+        />
+        <button
+          onClick={addWish}
+          className="mt-2 w-full bg-white text-orange-600 font-bold py-2 rounded-xl shadow-lg hover:scale-105 transition-transform flex items-center justify-center gap-2"
+        >
+          <Send size={18} /> Add Wish
+        </button>
+      </div>
+
+      <p className="text-white/90 text-sm mb-3 text-center">
+        {wishes.length} wishes in the jar ✨
+      </p>
+
+      <button
+        onClick={drawWish}
+        disabled={wishes.length === 0}
+        className="w-full bg-white/20 backdrop-blur-md text-white font-bold py-3 rounded-xl shadow-lg disabled:opacity-50 hover:bg-white/30 transition-all"
+      >
+        Draw a Wish
+      </button>
+
+      <AnimatePresence>
+        {showWish && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            className="fixed inset-0 z-[200] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+            onClick={() => setShowWish(null)}
+          >
+            <motion.div
+              initial={{ y: 50, rotate: -5 }}
+              animate={{ y: 0, rotate: 0 }}
+              className="bg-white p-8 rounded-3xl shadow-2xl max-w-md relative"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Star className="w-12 h-12 text-amber-500 mx-auto mb-4 fill-amber-500" />
+              <p className="text-gray-800 text-lg font-medium text-center mb-6">
+                "{showWish}"
+              </p>
+              <button
+                onClick={() => setShowWish(null)}
+                className="w-full bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold py-3 rounded-xl"
+              >
+                Close
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  )
+}
+
+/* -------------------- NEW: Photo Booth -------------------- */
+function PhotoBooth() {
+  const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null)
+  const [effect, setEffect] = useState<string>('none')
+
+  const effects = [
+    { name: 'none', label: 'Original' },
+    { name: 'hearts', label: '💕 Hearts' },
+    { name: 'vintage', label: '📷 Vintage' },
+    { name: 'dreamy', label: '✨ Dreamy' },
+  ]
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="bg-gradient-to-br from-cyan-400 to-blue-500 p-6 rounded-3xl shadow-2xl h-full"
+    >
+      <h3 className="text-white font-bold text-xl mb-4 flex items-center justify-center gap-2">
+        <ImageIcon /> Photo Booth
+      </h3>
+
+      <div className="grid grid-cols-3 gap-2 mb-4">
+        {allPhotos.slice(0, 6).map((photo) => (
+          <motion.div
+            key={photo.id}
+            whileHover={{ scale: 1.05 }}
+            onClick={() => setSelectedPhoto(photo.url)}
+            className={`aspect-square rounded-xl overflow-hidden cursor-pointer border-4 ${
+              selectedPhoto === photo.url ? 'border-white' : 'border-transparent'
+            }`}
+          >
+            <Image src={photo.url} alt="Photo" width={100} height={100} className="w-full h-full object-cover" />
+          </motion.div>
+        ))}
+      </div>
+
+      {selectedPhoto && (
+        <>
+          <div className="relative aspect-square rounded-2xl overflow-hidden mb-4 border-4 border-white">
+            <Image 
+              src={selectedPhoto} 
+              alt="Selected" 
+              fill 
+              className={`object-cover ${
+                effect === 'vintage' ? 'sepia contrast-125' :
+                effect === 'dreamy' ? 'blur-[0.5px] brightness-110' :
+                ''
+              }`}
+            />
+            {effect === 'hearts' && (
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                {[...Array(5)].map((_, i) => (
+                  <motion.div
+                    key={i}
+                    animate={{
+                      y: [0, -100],
+                      opacity: [1, 0],
+                      scale: [1, 1.5]
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      delay: i * 0.4
+                    }}
+                    className="absolute"
+                    style={{
+                      left: `${20 + i * 15}%`,
+                      bottom: 0
+                    }}
+                  >
+                    <Heart className="text-pink-500 fill-pink-500 w-8 h-8" />
+                  </motion.div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="flex gap-2 overflow-x-auto pb-2">
+            {effects.map((eff) => (
+              <button
+                key={eff.name}
+                onClick={() => setEffect(eff.name)}
+                className={`px-4 py-2 rounded-xl font-semibold whitespace-nowrap transition-all ${
+                  effect === eff.name
+                    ? 'bg-white text-blue-600'
+                    : 'bg-white/20 text-white hover:bg-white/30'
+                }`}
+              >
+                {eff.label}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+    </motion.div>
+  )
+}
+
+/* -------------------- NEW: Love Language -------------------- */
+function LoveLanguage() {
+  const languages = [
+    { name: 'Words of Affirmation', percentage: 95, icon: '💬', color: 'from-pink-500 to-rose-500' },
+    { name: 'Quality Time', percentage: 90, icon: '⏰', color: 'from-purple-500 to-indigo-500' },
+    { name: 'Physical Touch', percentage: 88, icon: '🤝', color: 'from-red-500 to-pink-500' },
+    { name: 'Acts of Service', percentage: 85, icon: '🎁', color: 'from-blue-500 to-cyan-500' },
+    { name: 'Receiving Gifts', percentage: 50, icon: '💝', color: 'from-amber-500 to-orange-500' }
+  ]
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="bg-white/60 backdrop-blur-md p-6 rounded-3xl shadow-xl h-full"
+    >
+      <h3 className="text-gray-800 font-bold text-xl mb-6 text-center flex items-center justify-center gap-2">
+        <Heart className="text-rose-500" /> Our Love Languages
+      </h3>
+
+      <div className="space-y-4">
+        {languages.map((lang, i) => (
+          <motion.div
+            key={lang.name}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: i * 0.1 }}
+          >
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                <span className="text-xl">{lang.icon}</span>
+                {lang.name}
+              </span>
+              <span className="text-sm font-bold text-gray-600">{lang.percentage}%</span>
+            </div>
+            <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
+              <motion.div
+                initial={{ width: 0 }}
+                animate={{ width: `${lang.percentage}%` }}
+                transition={{ duration: 1, delay: i * 0.1 }}
+                className={`h-full bg-gradient-to-r ${lang.color} rounded-full`}
+              />
+            </div>
+          </motion.div>
+        ))}
+      </div>
+    </motion.div>
+  )
+}
+
+/* -------------------- Existing Components -------------------- */
 
 function MilestoneCounter() {
   const [timeLeft, setTimeLeft] = useState(calculateTimeLeft())
@@ -79,7 +403,6 @@ function MilestoneCounter() {
     const timer = setInterval(() => {
       const newTime = calculateTimeLeft()
       
-      // Trigger confetti on month anniversary
       if (newTime.days === 0 && newTime.hours === 0 && newTime.minutes === 0 && newTime.seconds === 0) {
         setShowConfetti(true)
         setTimeout(() => setShowConfetti(false), 5000)
@@ -449,12 +772,11 @@ export default function Home() {
   const [isPlaying, setIsPlaying] = useState(false)
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null)
   const [showShareMenu, setShowShareMenu] = useState(false)
-  const [isUnlocked, setIsUnlocked] = useState(true) // Start unlocked by default
+  const [isUnlocked, setIsUnlocked] = useState(true)
   const [pinInput, setPinInput] = useState('')
   const [pinError, setPinError] = useState(false)
   const audioRef = useRef<HTMLAudioElement>(null)
 
-  // Check localStorage on mount - only lock if explicitly locked before
   useEffect(() => { 
     setMounted(true)
     const wasLocked = localStorage.getItem('loveStoryLocked')
@@ -463,7 +785,6 @@ export default function Home() {
     }
   }, [])
 
-  // Interactive Cursor Trail
   useEffect(() => {
     if (!isUnlocked) return;
 
@@ -552,7 +873,7 @@ export default function Home() {
     e.preventDefault()
     if (pinInput === '1410') {
       setIsUnlocked(true)
-      localStorage.removeItem('loveStoryLocked') // Remove locked state
+      localStorage.removeItem('loveStoryLocked')
     } else {
       setPinError(true)
       setPinInput('')
@@ -572,11 +893,9 @@ export default function Home() {
     }))
   }, [mounted])
 
-  // Lock Screen
   if (!isUnlocked) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-rose-100 via-pink-50 to-purple-100 flex items-center justify-center p-4 relative overflow-hidden" suppressHydrationWarning>
-        {/* Animated background */}
         {mounted && (
           <div className="absolute inset-0">
             {[...Array(15)].map((_, i) => (
@@ -648,7 +967,6 @@ export default function Home() {
     )
   }
 
-  // Main App
   return (
     <div className="min-h-screen bg-gradient-to-br from-rose-100 via-pink-50 to-purple-100 flex flex-col items-center justify-start py-12 px-4 overflow-x-hidden relative" suppressHydrationWarning>
       
@@ -656,7 +974,6 @@ export default function Home() {
         <source src="/music/raabta.mp3" type="audio/mpeg" />
       </audio>
 
-      {/* Floating Controls */}
       <div className="fixed top-4 right-4 z-[60] flex gap-2">
         <motion.button 
           onClick={toggleMusic}
@@ -698,7 +1015,6 @@ export default function Home() {
         </motion.button>
       </div>
 
-      {/* Share Menu */}
       <AnimatePresence>
         {showShareMenu && (
           <motion.div
@@ -724,7 +1040,6 @@ export default function Home() {
         )}
       </AnimatePresence>
 
-      {/* Background Bubbles */}
       {mounted && bubbleConfigs.length > 0 && (
         <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
           {bubbleConfigs.map((bubble) => (
@@ -763,7 +1078,6 @@ export default function Home() {
         </div>
       )}
 
-      {/* Main Content */}
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -798,7 +1112,6 @@ export default function Home() {
           "From an awkward hello to forever together"
         </p>
 
-        {/* Counter */}
         <div className="bg-white/30 backdrop-blur-sm p-4 rounded-[2rem] border border-white/50 shadow-sm inline-block w-full max-w-4xl">
            <MilestoneCounter />
            <p className="text-rose-500 font-bold mt-4 tracking-widest uppercase flex items-center justify-center gap-2 text-sm md:text-base">
@@ -806,22 +1119,24 @@ export default function Home() {
            </p>
         </div>
 
-        {/* Daily Love Message */}
         <DailyLoveMessage />
-
-        {/* Love Notes Carousel */}
         <LoveNotes />
+        
+        {/* NEW FEATURES - Side by Side Layouts */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-8 max-w-6xl mx-auto">
+          <LoveCalculator />
+          <WishJar />
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-8 max-w-6xl mx-auto">
+          <PhotoBooth />
+          <LoveLanguage />
+        </div>
 
-        {/* Memory Stats */}
         <MemoryCounter />
-
-        {/* Upcoming Milestones */}
         <UpcomingMilestones />
-
-        {/* Random Memory Button */}
         <RandomMemoryButton photos={allPhotos} onClick={setSelectedPhoto} />
 
-        {/* Navigation */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 my-12 px-2">
           {[
             { href: '/gallery', icon: Camera, color: 'text-rose-500', gradient: 'from-rose-400 to-pink-500', label: 'Gallery', sub: 'Memories' },
@@ -846,7 +1161,6 @@ export default function Home() {
           ))}
         </div>
 
-        {/* Scratch Card */}
         <div className="mb-16">
            <h2 className="text-rose-500 font-black text-sm uppercase tracking-[0.3em] mb-6 flex items-center justify-center gap-2">
              <Heart size={16} fill="currentColor" /> A Secret for You <Heart size={16} fill="currentColor" />
@@ -854,7 +1168,6 @@ export default function Home() {
            <ScratchCard />
         </div>
 
-        {/* Footer */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -874,7 +1187,6 @@ export default function Home() {
         </motion.div>
       </motion.div>
 
-      {/* Lightbox */}
       <AnimatePresence>
         {selectedPhoto && (
           <motion.div
